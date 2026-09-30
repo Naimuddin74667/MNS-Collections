@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MNS Collections – Style that makes you smile</title>
+<meta name="description" content="Ethnic and everyday jewellery from MNS Collections. Order on WhatsApp, pay by UPI.">
+<meta name="theme-color" content="#5C1F2B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blush:#F6E4E1;      /* page background */
+  --petal:#FBF1EF;      /* raised surfaces */
+  --wine:#5C1F2B;       /* brand dark */
+  --wine-deep:#431520;  /* footer */
+  --rose:#B8606B;       /* buttons, links */
+  --rose-soft:#E3A0A6;  /* accents on dark */
+  --ink:#3A1119;        /* body text */
+  --muted:#7A4A52;      /* secondary text */
+  --line:#E7C9C4;
+  --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Jost',Futura,'Century Gothic','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--blush);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6}
+img{max-width:100%;display:block}
+a{color:var(--rose)}
+a:hover{color:var(--wine)}
+:focus-visible{outline:3px solid var(--rose);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;color:var(--wine);line-height:1.15;margin:0 0 .4em}
+h1{font-size:clamp(2.2rem,5vw,3.2rem)}
+h2{font-size:clamp(1.8rem,3.6vw,2.4rem)}
+h3{font-size:1.35rem}
+p{margin:0 0 1em;max-width:62ch}
+
+/* Header */
+.top{position:sticky;top:0;z-index:10;background:rgba(246,228,225,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--wine)}
+.brand b{font-family:var(--serif);font-weight:700;font-size:28px;letter-spacing:.06em;line-height:1}
+.brand span{font-size:11px;letter-spacing:.35em;color:var(--muted)}
+.nav{display:flex;gap:4px;align-items:center}
+.nav a{text-decoration:none;color:var(--ink);padding:10px 12px;border-radius:8px;font-size:15px}
+.nav a[aria-current="page"]{color:var(--wine);background:var(--petal)}
+.nav a.wa{background:var(--wine);color:var(--blush);padding:10px 14px}
+.nav a.wa:hover{background:var(--wine-deep)}
+@media (max-width:620px){.brand span{display:none}.nav a{padding:10px 8px;font-size:14px}}
+
+/* Hero */
+.hero{background:var(--wine);color:var(--blush)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;align-items:center;gap:32px;padding-top:56px;padding-bottom:56px}
+.hero svg{width:100%;max-width:420px;height:auto;justify-self:center}
+.hero h1{color:var(--blush);font-weight:500}
+.hero p{color:#F0C9C4;font-size:1.1rem}
+@media (max-width:820px){.hero .wrap{grid-template-columns:1fr;text-align:center;padding-top:36px}.hero p{margin-left:auto;margin-right:auto}.hero .actions{justify-content:center}}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;border:0;font:500 16px var(--sans);text-decoration:none;cursor:pointer}
+.btn-primary{background:var(--rose);color:#fff}
+.btn-primary:hover{background:#9E4B56;color:#fff}
+.btn-light{background:var(--blush);color:var(--wine)}
+.btn-light:hover{background:#fff;color:var(--wine)}
+.btn-outline{background:transparent;color:var(--wine);box-shadow:inset 0 0 0 1.5px var(--wine)}
+.btn-outline:hover{background:var(--petal);color:var(--wine)}
+.btn svg{width:20px;height:20px;flex:none}
+
+/* Sections */
+section{padding:56px 0}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.section-head p{margin:0;color:var(--muted)}
+
+/* Product grid */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 20px}
+@media (max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}}
+.card{text-decoration:none;color:inherit;display:block}
+.frame{aspect-ratio:4/5;border-radius:999px 999px 14px 14px;background:#EFD3CF;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.frame img{width:100%;height:100%;object-fit:cover}
+.frame .ph{width:34%;opacity:.8}
+.card:hover .frame{background:#EAC8C3}
+.card h3{font-size:1.2rem;margin:12px 0 2px}
+.price{font-weight:500;color:var(--wine)}
+.cat{font-size:14px;color:var(--muted)}
+
+/* Filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.filters button{min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid var(--line);background:var(--petal);color:var(--ink);font:500 15px var(--sans);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--wine);border-color:var(--wine);color:var(--blush)}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;counter-reset:s}
+.steps li{list-style:none;counter-increment:s;padding-top:8px;border-top:2px solid var(--rose-soft)}
+.steps li::before{content:counter(s);font-family:var(--serif);font-size:2.4rem;color:var(--rose);line-height:1.2;display:block}
+.steps{padding:0;margin:0}
+@media (max-width:720px){.steps{grid-template-columns:1fr}}
+
+/* Product page */
+.pd{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.pd .frame{max-width:460px;width:100%}
+@media (max-width:820px){.pd{grid-template-columns:1fr;gap:24px}.pd .frame{margin:0 auto}}
+.pd .price{font-size:1.6rem;font-family:var(--serif);font-weight:600;margin-bottom:16px;display:block}
+.qty{display:flex;align-items:center;gap:12px;margin:8px 0 20px}
+.qty button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--petal);font-size:20px;color:var(--wine);cursor:pointer}
+.qty output{min-width:2ch;text-align:center;font-weight:500;font-size:18px}
+.buy{display:flex;flex-direction:column;gap:12px;max-width:380px}
+.note{font-size:15px;color:var(--muted);margin-top:14px}
+.upi-id{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;margin-top:6px}
+.upi-id code{background:var(--petal);padding:4px 10px;border-radius:6px;font-family:var(--sans)}
+.link-btn{background:none;border:0;color:var(--rose);font:500 15px var(--sans);cursor:pointer;text-decoration:underline;min-height:44px}
+.back{display:inline-block;margin-bottom:20px;text-decoration:none}
+
+/* Policies */
+.policy-nav{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 32px}
+.policy-nav a{padding:8px 14px;border-radius:999px;background:var(--petal);text-decoration:none;font-size:15px}
+.policy{padding:28px 0;border-top:1px solid var(--line);scroll-margin-top:80px}
+.policy ul{padding-left:1.2em;max-width:62ch}
+.ph-text{background:#FFF6D9;padding:0 4px;border-radius:3px}
+
+/* Footer */
+footer{background:var(--wine-deep);color:#EBC9C6;padding:44px 0 28px;margin-top:40px}
+footer .wrap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}
+footer h3{color:var(--blush);font-size:1.2rem}
+footer a{color:#F0C9C4;text-decoration:none}
+footer a:hover{color:#fff;text-decoration:underline}
+footer ul{list-style:none;padding:0;margin:0;line-height:2}
+.fine{grid-column:1/-1;border-top:1px solid rgba(240,201,196,.25);padding-top:18px;font-size:14px}
+@media (max-width:720px){footer .wrap{grid-template-columns:1fr}}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--wine);color:var(--blush);padding:12px 20px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#/" aria-label="MNS Collections home"><b>MNS</b><span>COLLECTIONS</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/shop" data-route="shop">Shop</a>
+      <a href="#/about" data-route="about">About</a>
+      <a href="#/policies" data-route="policies">Policies</a>
+      <a class="wa" id="navWa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+    </nav>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h3>MNS Collections</h3>
+      <p>Style that makes you smile. Ethnic and everyday jewellery, delivered across India.</p>
+    </div>
+    <div>
+      <h3>Shop</h3>
+      <ul>
+        <li><a href="#/shop">All jewellery</a></li>
+        <li><a href="#/shop/ethnic">Ethnic</a></li>
+        <li><a href="#/shop/everyday">Everyday</a></li>
+        <li><a href="#/shop/gifting">Gifting</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Help</h3>
+      <ul>
+        <li><a href="#/policies/shipping">Shipping</a></li>
+        <li><a href="#/policies/returns">Returns &amp; refunds</a></li>
+        <li><a href="#/policies/contact">Contact us</a></li>
+        <li><a href="#/policies/privacy">Privacy</a></li>
+      </ul>
+    </div>
+    <p class="fine">© <span id="yr"></span> MNS Collections. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   1. YOUR DETAILS — edit these before going live
+   ========================================================= */
+const CONFIG = {
+  whatsapp: "91XXXXXXXXXX",          // country code + number, no + or spaces
+  upiId:    "yourname@upi",          // your UPI ID
+  upiName:  "MNS Collections",       // name shown in the UPI app
+  email:    "hello@example.com",     // contact email
+  address:  "[Your business address]",
+};
+
+/* =========================================================
+   2. PRODUCTS — SAMPLE ITEMS, replace with your real ones.
+   id: short unique name used in the link (no spaces)
+   category: ethnic | everyday | gifting
+   image: path to photo, e.g. "images/kundan-choker.jpg" ("" shows a placeholder)
+   featured: true = shown on the home page
+   ========================================================= */
+const PRODUCTS = [
+  { id:"kundan-choker", name:"Kundan choker set", price:299, category:"ethnic", featured:true, image:"",
+    desc:"Choker necklace with matching earrings. Replace this text with the real size, finish and what's in the box." },
+  { id:"oxidised-jhumka", name:"Oxidised jhumkas", price:149, category:"ethnic", featured:true, image:"",
+    desc:"Lightweight oxidised jhumkas. Replace with real details." },
+  { id:"pearl-drops", name:"Pearl drop earrings", price:99, category:"everyday", featured:true, image:"",
+    desc:"Simple pearl drops for daily and office wear. Replace with real details." },
+  { id:"heart-studs", name:"Heart studs, set of 3", price:149, category:"everyday", featured:true, image:"",
+    desc:"Three pairs of small studs. Replace with real details." },
+  { id:"layered-necklace", name:"Layered chain necklace", price:299, category:"everyday", featured:false, image:"",
+    desc:"Two-layer chain necklace. Replace with real details." },
+  { id:"maang-tikka", name:"Maang tikka", price:299, category:"ethnic", featured:false, image:"",
+    desc:"Festive maang tikka. Replace with real details." },
+  { id:"bangle-stack", name:"Bangle stack", price:149, category:"ethnic", featured:false, image:"",
+    desc:"Set of stackable bangles. Replace with the sizes available." },
+  { id:"earring-gift-box", name:"Earring gift box", price:299, category:"gifting", featured:false, image:"",
+    desc:"Three pairs of earrings in a gift box. Replace with real details." },
+];
+
+/* =========================================================
+   Site code — no need to edit below this line
+   ========================================================= */
+const CATS = { ethnic:"Ethnic", everyday:"Everyday", gifting:"Gifting" };
+const rupee = n => "₹" + n.toLocaleString("en-IN");
+const app = document.getElementById("app");
+
+const GEM = `<svg class="ph" viewBox="0 0 54 44" aria-hidden="true"><path d="M13 3H41L51 15L27 41L3 15Z" fill="#E3A0A6" stroke="#B8606B" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 15H51M19 3L15 15L27 41L39 15L35 3" fill="none" stroke="#FBEFEE" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
+const WA_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3a.4.4 0 0 0 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3Z"/></svg>`;
+const UPI_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg>`;
+
+const LOGO = `<svg viewBox="0 0 280 232" role="img" aria-label="MNS Collections – Style that makes you smile">
+  <text x="12" y="92" textLength="256" lengthAdjust="spacing" font-family="Cormorant Garamond, Georgia, serif" font-weight="700" font-size="112" fill="#F6E4E1">MNS</text>
+  <g transform="translate(12 100)">
+    <path d="M2 4Q128 44 254 4" fill="none" stroke="#E3A0A6" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M116 26H140L147 34L128 56L109 34Z" fill="#E3A0A6" stroke="#E3A0A6" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M109 34H147M121 26L118 34L128 56L138 34L135 26" fill="none" stroke="#FBEFEE" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="M160 18L161.9 24.1L168 26L161.9 27.9L160 34L158.1 27.9L152 26L158.1 24.1Z" fill="#F6E4E1"/>
+    <path d="M98 40L99 43L102 44L99 45L98 48L97 45L94 44L97 43Z" fill="#F6E4E1"/>
+  </g>
+  <text x="12" y="184" textLength="256" lengthAdjust="spacing" font-family="Jost, Futura, sans-serif" font-weight="500" font-size="16" fill="#F6E4E1">COLLECTIONS</text>
+  <text x="140" y="216" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-weight="500" font-size="23" fill="#F0C9C4">Style that makes you smile</text>
+</svg>`;
+
+function waLink(text){ return `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(text)}`; }
+function upiLink(amount, note){
+  const p = new URLSearchParams({ pa:CONFIG.upiId, pn:CONFIG.upiName, am:String(amount), cu:"INR", tn:note });
+  return "upi://pay?" + p.toString();
+}
+function card(p){
+  return `<a class="card" href="#/product/${p.id}">
+    <div class="frame">${p.image ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` : GEM}</div>
+    <h3>${p.name}</h3>
+    <div class="price">${rupee(p.price)}</div>
+    <div class="cat">${CATS[p.category]}</div>
+  </a>`;
+}
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200); }
+
+/* Pages */
+function home(){
+  const featured = PRODUCTS.filter(p=>p.featured);
+  return `
+  <div class="hero"><div class="wrap">
+    <div>
+      <h1>Jewellery for festive days and every day</h1>
+      <p>Kundan, oxidised and everyday styles from ${rupee(Math.min(...PRODUCTS.map(p=>p.price)))}. Pick what you love, order on WhatsApp and pay by UPI.</p>
+      <div class="actions">
+        <a class="btn btn-light" href="#/shop">Shop the collection</a>
+        <a class="btn btn-outline" style="color:#F6E4E1;box-shadow:inset 0 0 0 1.5px #E3A0A6" href="${waLink("Hi MNS Collections, I'd like to see your latest designs.")}" target="_blank" rel="noopener">${WA_ICON} Chat with us</a>
+      </div>
+    </div>
+    ${LOGO}
+  </div></div>
+
+  <section><div class="wrap">
+    <div class="section-head"><h2>New in</h2><a href="#/shop">See all jewellery</a></div>
+    <div class="grid">${featured.map(card).join("")}</div>
+  </div></section>
+
+  <section style="background:var(--petal)"><div class="wrap">
+    <h2>How ordering works</h2>
+    <ol class="steps">
+      <li><h3>Choose your piece</h3><p>Browse the shop and open any product to see details.</p></li>
+      <li><h3>Order on WhatsApp</h3><p>Tap the button and your order message is ready to send. We confirm stock and delivery charges.</p></li>
+      <li><h3>Pay by UPI</h3><p>Pay with any UPI app and send us the screenshot. We pack and ship your order.</p></li>
+    </ol>
+  </div></section>`;
+}
+
+function shop(cat){
+  const list = cat ? PRODUCTS.filter(p=>p.category===cat) : PRODUCTS;
+  const btn = (key,label) => `<button type="button" data-cat="${key}" aria-pressed="${(cat||"")===key}">${label}</button>`;
+  return `<section><div class="wrap">
+    <h1>Shop</h1>
+    <div class="filters" role="group" aria-label="Filter by category">
+      ${btn("","All")}${Object.entries(CATS).map(([k,v])=>btn(k,v)).join("")}
+    </div>
+    ${list.length ? `<div class="grid">${list.map(card).join("")}</div>`
+      : `<p>No pieces in this category yet. <a href="#/shop">See all jewellery</a> or message us on WhatsApp for something specific.</p>`}
+  </div></section>`;
+}
+
+function product(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return notFound();
+  return `<section><div class="wrap">
+    <a class="back" href="#/shop">Back to shop</a>
+    <div class="pd">
+      <div class="frame">${p.image ? `<img src="${p.image}" alt="${p.name}">` : GEM}</div>
+      <div>
+        <div class="cat">${CATS[p.category]}</div>
+        <h1>${p.name}</h1>
+        <span class="price">${rupee(p.price)}</span>
+        <p>${p.desc}</p>
+        <div class="qty" aria-label="Quantity">
+          <button type="button" id="qMinus" aria-label="Decrease quantity">−</button>
+          <output id="qVal" aria-live="polite">1</output>
+          <button type="button" id="qPlus" aria-label="Increase quantity">+</button>
+        </div>
+        <div class="buy">
+          <a class="btn btn-primary" id="waBuy" target="_blank" rel="noopener">${WA_ICON} Order on WhatsApp</a>
+          <a class="btn btn-outline" id="upiBuy">${UPI_ICON} Pay <span id="upiAmt">${rupee(p.price)}</span> via UPI</a>
+        </div>
+        <div class="upi-id">UPI ID: <code>${CONFIG.upiId}</code> <button class="link-btn" type="button" id="copyUpi">Copy</button></div>
+        <p class="note">The UPI button opens your payment app on a phone. On a computer, pay to the UPI ID above. After paying, send the screenshot on WhatsApp so we can confirm your order. Delivery charges are confirmed on WhatsApp.</p>
+      </div>
+    </div>
+  </div></section>`;
+}
+function wireProduct(id){
+  const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
+  let q = 1;
+  const upd = () => {
+    const total = p.price*q;
+    document.getElementById("qVal").textContent = q;
+    document.getElementById("upiAmt").textContent = rupee(total);
+    document.getElementById("waBuy").href = waLink(`Hi MNS Collections, I'd like to order:\n${p.name} (${p.id})\nQuantity: ${q}\nTotal: ${rupee(total)}\n\nMy name:\nDelivery address with pincode:`);
+    document.getElementById("upiBuy").href = upiLink(total, `${p.name} x${q}`);
+  };
+  document.getElementById("qMinus").onclick = () => { if(q>1){q--;upd();} };
+  document.getElementById("qPlus").onclick  = () => { if(q<10){q++;upd();} };
+  document.getElementById("copyUpi").onclick = () => {
+    navigator.clipboard?.writeText(CONFIG.upiId).then(()=>toast("UPI ID copied"), ()=>toast("Copy failed. Select the UPI ID and copy it manually."));
+  };
+  upd();
+}
+
+function about(){
+  return `<section><div class="wrap">
+    <h1>About MNS Collections</h1>
+    <p>MNS Collections brings together ethnic and everyday jewellery at prices that make it easy to treat yourself or someone you love.</p>
+    <p>From kundan sets for weddings and festivals to light earrings for college and office, every piece is chosen to look good and feel comfortable.</p>
+    <p>Our promise is simple, and it's in our name: style that makes you smile.</p>
+    <p><a class="btn btn-primary" href="#/shop">Shop the collection</a></p>
+  </div></section>`;
+}
+
+function policies(){
+  const ph = t => `<span class="ph-text">${t}</span>`;
+  return `<section><div class="wrap">
+    <h1>Policies</h1>
+    <p>Text highlighted in yellow is a placeholder. Replace it with your own terms before going live.</p>
+    <nav class="policy-nav" aria-label="Policies">
+      <a href="#/policies/shipping">Shipping</a><a href="#/policies/returns">Returns &amp; refunds</a>
+      <a href="#/policies/terms">Terms</a><a href="#/policies/privacy">Privacy</a><a href="#/policies/contact">Contact</a>
+    </nav>
+
+    <div class="policy" id="shipping"><h2>Shipping policy</h2>
+      <ul>
+        <li>We ship across India. Orders are dispatched within ${ph("[X]")} working days after payment is confirmed.</li>
+        <li>Delivery usually takes ${ph("[X–Y]")} working days depending on your location.</li>
+        <li>Shipping charges: ${ph("[free above ₹X / flat ₹X]")}. The exact amount is confirmed on WhatsApp before you pay.</li>
+        <li>You'll receive a tracking number on WhatsApp once your order ships.</li>
+      </ul></div>
+
+    <div class="policy" id="returns"><h2>Returns &amp; refunds</h2>
+      <ul>
+        <li>If your item arrives damaged or wrong, message us on WhatsApp within ${ph("[X]")} days of delivery with an unboxing video and photos.</li>
+        <li>Earrings cannot be returned for hygiene reasons unless damaged on arrival.</li>
+        <li>Approved refunds are sent to your original UPI account within ${ph("[X]")} working days.</li>
+        <li>${ph("[Add whether you offer exchanges, and who pays return shipping.]")}</li>
+      </ul></div>
+
+    <div class="policy" id="terms"><h2>Terms of use</h2>
+      <ul>
+        <li>All products are artificial (imitation) jewellery. Colours may look slightly different in person due to lighting and screens.</li>
+        <li>Prices are in Indian Rupees and may change without notice. The price confirmed on WhatsApp at the time of order applies.</li>
+        <li>An order is confirmed only after payment is received and acknowledged by us.</li>
+        <li>This website is operated by ${ph("[MNS Enterprises / your registered business name]")}.</li>
+      </ul></div>
+
+    <div class="policy" id="privacy"><h2>Privacy policy</h2>
+      <ul>
+        <li>We collect only what's needed to deliver your order: your name, phone number and delivery address.</li>
+        <li>We use these details only to process and ship your order and to contact you about it.</li>
+        <li>We don't sell or share your details, except with the courier delivering your order.</li>
+        <li>To have your details deleted, message us on WhatsApp or email us.</li>
+      </ul></div>
+
+    <div class="policy" id="contact"><h2>Contact us</h2>
+      <ul>
+        <li>WhatsApp: <a href="${waLink("Hi MNS Collections")}" target="_blank" rel="noopener">+${CONFIG.whatsapp}</a></li>
+        <li>Email: <a href="mailto:${CONFIG.email}">${CONFIG.email}</a></li>
+        <li>Address: ${CONFIG.address}</li>
+      </ul></div>
+  </div></section>`;
+}
+
+function notFound(){
+  return `<section><div class="wrap"><h1>Page not found</h1><p>This link may be old or mistyped. <a href="#/shop">Go to the shop</a> to see all jewellery.</p></div></section>`;
+}
+
+/* Router */
+function route(){
+  const parts = (location.hash.replace(/^#\/?/,"") || "").split("/");
+  const [page, arg] = parts;
+  let html;
+  if(!page) html = home();
+  else if(page==="shop") html = shop(CATS[arg] ? arg : "");
+  else if(page==="product") html = product(arg);
+  else if(page==="about") html = about();
+  else if(page==="policies") html = policies();
+  else html = notFound();
+  app.innerHTML = html;
+
+  document.querySelectorAll(".nav a[data-route]").forEach(a=>{
+    a.toggleAttribute("aria-current", a.dataset.route===page);
+    if(a.dataset.route===page) a.setAttribute("aria-current","page");
+  });
+  if(page==="product") wireProduct(arg);
+  if(page==="shop") app.querySelectorAll(".filters button").forEach(b=>{
+    b.onclick = () => { location.hash = b.dataset.cat ? `#/shop/${b.dataset.cat}` : "#/shop"; };
+  });
+  if(page==="policies" && arg){ const el=document.getElementById(arg); if(el){ el.scrollIntoView(); return; } }
+  window.scrollTo(0,0);
+  const titles = {shop:"Shop", about:"About", policies:"Policies"};
+  const pr = page==="product" && PRODUCTS.find(x=>x.id===arg);
+  document.title = (pr ? pr.name : titles[page] || "Style that makes you smile") + " – MNS Collections";
+}
+document.getElementById("navWa").href = waLink("Hi MNS Collections");
+document.getElementById("yr").textContent = new Date().getFullYear();
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
