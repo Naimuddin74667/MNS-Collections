@@ -1,0 +1,12 @@
+# MNS Collections — Inventory Manager worker
+# Deployed automatically by .github/workflows/deploy-inventory.yml
+# database_id is filled in by the workflow (it creates the D1 database on first run).
+name = "mns-inventory"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mns_inventory"
+database_id = "__D1_ID__"

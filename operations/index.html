@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>MNS Operations – Inventory</title>
+<meta name="theme-color" content="#1E0B10">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* MNS brand colours (from the main site), dark operations theme */
+:root{
+  --bg:#1E0B10; --surface:#2A1218; --surface2:#351922; --line:#4A2530;
+  --text:#F6E4E1; --muted:#C9A3A8; --accent:#E3A0A6; --accent-strong:#B8606B;
+  --ok:#7BC6A0; --warn:#E8B04A; --bad:#E5707A;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Jost','Segoe UI',sans-serif;
+  --r:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.right{text-align:right}
+
+/* ---- buttons & inputs ---- */
+.btn{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent-strong);border-color:var(--accent-strong);color:#fff;font-weight:500}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn.sm{padding:4px 10px;font-size:13px}
+.btn.danger{color:var(--bad)}
+.btn.in{color:var(--ok)} .btn.out{color:var(--warn)}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.check{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px;margin-top:10px}
+.check input{width:auto}
+
+/* ---- login ---- */
+#loginView{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:32px;width:100%;max-width:380px}
+.brand{font-family:var(--serif);font-weight:700;font-size:40px;letter-spacing:2px;color:var(--accent);line-height:1}
+.brand small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:5px;color:var(--muted);font-weight:500;margin-top:4px}
+.login-card .btn{width:100%;margin-top:18px;padding:11px}
+.msg{margin-top:12px;font-size:14px;min-height:20px}
+.msg.err{color:var(--bad)}
+
+/* ---- app shell ---- */
+header{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:16px;padding:10px 20px;max-width:1200px;margin:0 auto}
+.bar .brand{font-size:26px}
+.bar .brand small{font-size:9px;letter-spacing:3px}
+nav{display:flex;gap:4px;overflow-x:auto;flex:1}
+nav button{white-space:nowrap;background:none;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;color:var(--muted)}
+nav button.active{color:var(--text);background:var(--surface2);box-shadow:inset 0 -2px 0 var(--accent)}
+.who{font-size:13px;color:var(--muted);white-space:nowrap}
+main{max-width:1200px;margin:0 auto;padding:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.toolbar input,.toolbar select{width:auto;min-width:160px}
+.toolbar .grow{flex:1}
+h2{font-family:var(--serif);font-size:28px;margin:0 0 14px;font-weight:700}
+h3{font-size:15px;margin:0 0 10px;font-weight:600;color:var(--accent)}
+
+/* ---- dashboard ---- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .v{font-size:24px;font-weight:600;margin-top:2px}
+.kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.kpi.warn .v{color:var(--warn)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;overflow-x:auto}
+
+/* ---- tables ---- */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;background:var(--surface2);border:1px solid var(--line)}
+.tag.in{color:var(--ok)} .tag.out{color:var(--warn)} .tag.adjust{color:var(--accent)}
+.pos{color:var(--ok)} .neg{color:var(--warn)}
+
+/* ---- product cards ---- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.card.inactive{opacity:.5}
+.card .img{aspect-ratio:4/3;background:var(--surface2);display:grid;place-items:center;color:var(--muted);font-size:13px}
+.card .img img{width:100%;height:100%;object-fit:cover}
+.card .body{padding:12px 14px;flex:1}
+.card .sku{font-size:12px;color:var(--muted);letter-spacing:.5px}
+.card .name{font-weight:500;margin:2px 0 8px}
+.card .prices{display:flex;gap:12px;font-size:13px;color:var(--muted)}
+.card .prices b{color:var(--text);font-weight:500}
+.stock{font-size:13px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(123,198,160,.15);color:var(--ok)}
+.stock.low{background:rgba(232,176,74,.15);color:var(--warn)}
+.stock.zero{background:rgba(229,112,122,.15);color:var(--bad)}
+.card .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card .actions{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
+.card .actions .btn{flex:1}
+
+/* ---- modal ---- */
+.modal-bg{position:fixed;inset:0;background:rgba(10,3,5,.7);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto}
+.modal h2{font-size:24px}
+.modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.img-pick{display:flex;gap:12px;align-items:center}
+.img-pick .prev{width:72px;height:72px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;flex-shrink:0;display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.img-pick .prev img{width:100%;height:100%;object-fit:cover}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--accent);padding:10px 18px;border-radius:10px;z-index:99;font-size:14px}
+.toast.err{border-color:var(--bad);color:var(--bad)}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:var(--r)}
+
+@media (max-width:760px){
+  .panels{grid-template-columns:1fr}
+  .bar{flex-wrap:wrap;padding:10px 14px}
+  nav{order:3;flex-basis:100%}
+  main{padding:14px}
+  .row3{grid-template-columns:1fr 1fr}
+  .toolbar input,.toolbar select{min-width:0;flex:1 1 140px}
+  .card .img{aspect-ratio:16/9}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<section id="loginView" class="hidden">
+  <form class="login-card" id="loginForm">
+    <div class="brand">MNS<small>OPERATIONS</small></div>
+    <p class="muted" id="loginIntro">Log in to manage inventory.</p>
+    <label for="lgUser">Username</label>
+    <input id="lgUser" autocomplete="username" required>
+    <label for="lgPass">Password</label>
+    <input id="lgPass" type="password" autocomplete="current-password" required>
+    <button class="btn primary" id="loginBtn">Log in</button>
+    <div class="msg" id="loginMsg"></div>
+  </form>
+</section>
+
+<!-- ================= APP ================= -->
+<section id="appView" class="hidden">
+  <header>
+    <div class="bar">
+      <div class="brand">MNS<small>INVENTORY</small></div>
+      <nav id="tabs">
+        <button data-tab="dashboard" class="active">Dashboard</button>
+        <button data-tab="products">Products</button>
+        <button data-tab="stock">Stock log</button>
+        <button data-tab="settings">Settings</button>
+      </nav>
+      <span class="who" id="whoAmI"></span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Dashboard -->
+    <div data-view="dashboard">
+      <div class="kpis" id="kpis"></div>
+      <div class="panels">
+        <div class="panel"><h3>Sales — last 30 days by channel</h3><div id="salesByChannel"></div></div>
+        <div class="panel"><h3>Low / out of stock</h3><div id="lowStock"></div></div>
+      </div>
+      <div class="panel" style="margin-top:16px"><h3>Margin per SKU <span class="muted" style="font-weight:400">(before marketplace fees)</span></h3><div id="marginTable"></div></div>
+    </div>
+
+    <!-- Products -->
+    <div data-view="products" class="hidden">
+      <div class="toolbar">
+        <input id="pSearch" class="grow" placeholder="Search SKU or name…">
+        <select id="pCategory"><option value="">All categories</option></select>
+        <select id="pStatus">
+          <option value="active">Active</option><option value="low">Low stock</option>
+          <option value="inactive">Inactive</option><option value="all">All</option>
+        </select>
+        <button class="btn" id="pExport">Export CSV</button>
+        <button class="btn primary" id="pAdd">+ Add product</button>
+      </div>
+      <div class="grid" id="productGrid"></div>
+    </div>
+
+    <!-- Stock log -->
+    <div data-view="stock" class="hidden">
+      <div class="toolbar">
+        <input id="mSearch" class="grow" placeholder="Search SKU, name or note…">
+        <select id="mType"><option value="">All types</option><option value="in">Stock in</option><option value="out">Stock out</option><option value="adjust">Adjust</option></select>
+        <select id="mChannel"><option value="">All channels</option></select>
+        <input id="mFrom" type="date" title="From">
+        <input id="mTo" type="date" title="To">
+        <button class="btn" id="mExport">Export CSV</button>
+      </div>
+      <div class="panel"><div id="movementTable"></div></div>
+    </div>
+
+    <!-- Settings -->
+    <div data-view="settings" class="hidden">
+      <div class="panels">
+        <form class="panel" id="pwForm">
+          <h3>Change password</h3>
+          <label>Current password</label><input type="password" id="pwOld" required autocomplete="current-password">
+          <label>New password (min 8)</label><input type="password" id="pwNew" required minlength="8" autocomplete="new-password">
+          <div class="foot" style="margin-top:14px"><button class="btn primary">Update password</button></div>
+        </form>
+        <div class="panel" id="usersPanel">
+          <h3>Users</h3>
+          <div id="userList"></div>
+          <form id="userForm" style="margin-top:12px">
+            <div class="row3">
+              <input id="uName" placeholder="Username" required>
+              <input id="uPass" type="password" placeholder="Password (min 8)" required minlength="8" autocomplete="new-password">
+              <select id="uRole"><option value="staff">Staff</option><option value="admin">Admin</option></select>
+            </div>
+            <div style="margin-top:10px"><button class="btn primary">Add user</button></div>
+          </form>
+        </div>
+      </div>
+      <div style="margin-top:16px"><button class="btn danger" id="logoutBtn">Log out</button></div>
+    </div>
+  </main>
+</section>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-bg hidden" id="productModal">
+  <form class="modal" id="productForm">
+    <h2 id="pmTitle">Add product</h2>
+    <input type="hidden" id="pmId">
+    <div class="img-pick">
+      <div class="prev" id="pmPrev">No photo</div>
+      <div>
+        <input type="file" id="pmFile" accept="image/*">
+        <div class="hint">Resized to 400px automatically.</div>
+        <button type="button" class="btn sm" id="pmClearImg" style="margin-top:6px">Remove photo</button>
+      </div>
+    </div>
+    <div class="row">
+      <div><label>SKU *</label><input id="pmSku" required placeholder="e.g. MNS-ER-001"></div>
+      <div><label>Category</label><input id="pmCat" list="catList" placeholder="Earrings"></div>
+    </div>
+    <label>Product name *</label><input id="pmName" required>
+    <div class="row3">
+      <div><label>Purchase price ₹</label><input id="pmCost" type="number" step="0.01" min="0"></div>
+      <div><label>Selling price ₹</label><input id="pmSell" type="number" step="0.01" min="0"></div>
+      <div><label>MRP ₹</label><input id="pmMrp" type="number" step="0.01" min="0"></div>
+    </div>
+    <div class="row3">
+      <div><label>Low stock alert at</label><input id="pmLow" type="number" min="0" value="3"></div>
+      <div><label>Amazon ASIN</label><input id="pmAsin"></div>
+      <div><label>Flipkart FSN</label><input id="pmFsn"></div>
+    </div>
+    <div id="pmOpeningWrap"><label>Opening stock (qty on hand now)</label><input id="pmOpening" type="number" min="0" value="0"></div>
+    <label class="check"><input type="checkbox" id="pmActive" checked> Active</label>
+    <div class="foot">
+      <button type="button" class="btn danger hidden" id="pmDelete" style="margin-right:auto">Delete</button>
+      <button type="button" class="btn" data-close>Cancel</button>
+      <button class="btn primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<div class="modal-bg hidden" id="moveModal">
+  <form class="modal" id="moveForm">
+    <h2 id="mmTitle">Stock in</h2>
+    <p class="muted" id="mmProduct" style="margin:0"></p>
+    <input type="hidden" id="mmPid"><input type="hidden" id="mmType">
+    <div class="row">
+      <div><label id="mmQtyLabel">Quantity</label><input id="mmQty" type="number" required></div>
+      <div><label>Date</label><input id="mmDate" type="date" required></div>
+    </div>
+    <div class="row">
+      <div id="mmChannelWrap"><label>Channel</label><select id="mmChannel"></select></div>
+      <div><label id="mmPriceLabel">Unit price ₹</label><input id="mmPrice" type="number" step="0.01" min="0"></div>
+    </div>
+    <label class="check" id="mmUpdateCostWrap"><input type="checkbox" id="mmUpdateCost"> Use this as the new purchase price</label>
+    <label>Note</label><input id="mmNote" placeholder="Supplier, order ID, reason…">
+    <div class="foot">
+      <button type="button" class="btn" data-close>Cancel</button>
+      <button class="btn primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<datalist id="catList"></datalist>
+
+<script>
+// ===================== CONFIG =====================
+const API = 'https://mns-inventory.naimuddinshaikh74667.workers.dev/';
+const TOKEN_KEY = 'mns_inv_token_v1';
+
+// ===================== STATE =====================
+let token = null;
+try { token = localStorage.getItem(TOKEN_KEY); } catch (e) {}
+let me = null;
+let products = [];
+let movements = [];
+let channels = ['Amazon', 'Flipkart', 'Instagram', 'WhatsApp', 'Offline', 'Damage', 'Other'];
+let needsSetup = false;
+
+// ===================== HELPERS =====================
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inr = n => '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+const inr2 = n => '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const todayStr = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+
+function toast(text, isErr) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+// Single entry point for all API calls
+async function api(action, body, query = '') {
+  const opts = { headers: {} };
+  if (token) opts.headers.Authorization = 'Bearer ' + token;
+  if (body) {
+    opts.method = 'POST';
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  let res;
+  try { res = await fetch(API + '?action=' + action + query, opts); }
+  catch (e) { throw new Error('Cannot reach server — check internet'); }
+  const data = await res.json().catch(() => ({ ok: false, error: 'Bad server response' }));
+  if (res.status === 401 && action !== 'login' && action !== 'setup') { logoutLocal(); }
+  if (!data.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function stockClass(p) {
+  if (p.stock <= 0) return 'zero';
+  if (p.stock <= p.low_stock_at) return 'low';
+  return '';
+}
+
+function downloadCsv(filename, rows) {
+  const csv = rows.map(r => r.map(v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ===================== AUTH =====================
+async function boot() {
+  if (token) {
+    try {
+      me = (await api('me')).user;
+      return showApp();
+    } catch (e) { /* fall through to login */ }
+  }
+  showLogin();
+}
+
+async function showLogin() {
+  $('appView').classList.add('hidden');
+  $('loginView').classList.remove('hidden');
+  try {
+    needsSetup = (await api('setupStatus')).needsSetup;
+  } catch (e) {
+    $('loginMsg').className = 'msg err';
+    $('loginMsg').textContent = e.message;
+  }
+  $('loginIntro').textContent = needsSetup ? 'First time here — create the admin account.' : 'Log in to manage inventory.';
+  $('loginBtn').textContent = needsSetup ? 'Create admin & log in' : 'Log in';
+  $('lgPass').autocomplete = needsSetup ? 'new-password' : 'current-password';
+}
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = $('loginMsg');
+  msg.className = 'msg'; msg.textContent = 'Please wait…';
+  $('loginBtn').disabled = true;
+  try {
+    const data = await api(needsSetup ? 'setup' : 'login', { username: $('lgUser').value, password: $('lgPass').value });
+    token = data.token; me = data.user;
+    try { localStorage.setItem(TOKEN_KEY, token); } catch (e) {}
+    $('lgPass').value = ''; msg.textContent = '';
+    showApp();
+  } catch (err) {
+    msg.className = 'msg err'; msg.textContent = err.message;
+  } finally { $('loginBtn').disabled = false; }
+});
+
+function logoutLocal() {
+  token = null; me = null;
+  try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+  showLogin();
+}
+
+$('logoutBtn').addEventListener('click', async () => {
+  try { await api('logout', {}); } catch (e) {}
+  logoutLocal();
+});
+
+// ===================== APP SHELL =====================
+async function showApp() {
+  $('loginView').classList.add('hidden');
+  $('appView').classList.remove('hidden');
+  $('whoAmI').textContent = me.username + (me.role === 'admin' ? ' · admin' : '');
+  $('usersPanel').classList.toggle('hidden', me.role !== 'admin');
+  await refreshAll();
+}
+
+async function refreshAll() {
+  try {
+    const [p, m] = await Promise.all([api('listProducts'), api('listMovements', null, '&limit=2000')]);
+    products = p.products; channels = p.channels || channels; movements = m.movements;
+    fillFilters();
+    renderAll();
+  } catch (e) { toast(e.message, true); }
+}
+
+function renderAll() { renderDashboard(); renderProducts(); renderMovements(); }
+
+$('tabs').addEventListener('click', e => {
+  const tab = e.target.dataset.tab;
+  if (!tab) return;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('[data-view]').forEach(v => v.classList.toggle('hidden', v.dataset.view !== tab));
+  if (tab === 'settings' && me.role === 'admin') loadUsers();
+});
+
+function fillFilters() {
+  const cats = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
+  const keep = $('pCategory').value;
+  $('pCategory').innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option>${esc(c)}</option>`).join('');
+  $('pCategory').value = keep;
+  $('catList').innerHTML = cats.map(c => `<option value="${esc(c)}">`).join('');
+  const keepCh = $('mChannel').value;
+  $('mChannel').innerHTML = '<option value="">All channels</option>' + channels.map(c => `<option>${esc(c)}</option>`).join('');
+  $('mChannel').value = keepCh;
+  $('mmChannel').innerHTML = channels.map(c => `<option>${esc(c)}</option>`).join('');
+}
+
+// ===================== DASHBOARD =====================
+function renderDashboard() {
+  const active = products.filter(p => p.active);
+  const units = active.reduce((s, p) => s + Math.max(0, p.stock), 0);
+  const costValue = active.reduce((s, p) => s + Math.max(0, p.stock) * p.cost_price, 0);
+  const sellValue = active.reduce((s, p) => s + Math.max(0, p.stock) * p.sell_price, 0);
+  const low = active.filter(p => stockClass(p)).sort((a, b) => a.stock - b.stock);
+
+  // Sales in the last 30 days (stock-out entries, excluding Damage)
+  const since = new Date(Date.now() - 30 * 864e5).toLocaleDateString('en-CA');
+  const costOf = Object.fromEntries(products.map(p => [p.id, p.cost_price]));
+  const byCh = {};
+  movements.filter(m => m.type === 'out' && m.move_date >= since).forEach(m => {
+    const c = byCh[m.channel] ||= { units: 0, revenue: 0, cost: 0 };
+    const q = -m.delta;
+    c.units += q;
+    c.revenue += q * m.unit_price;
+    c.cost += q * (costOf[m.product_id] || 0);
+  });
+  const sales = Object.entries(byCh).filter(([ch]) => ch !== 'Damage');
+  const rev30 = sales.reduce((s, [, c]) => s + c.revenue, 0);
+
+  $('kpis').innerHTML = [
+    ['Active SKUs', active.length],
+    ['Units in stock', units.toLocaleString('en-IN')],
+    ['Stock value (cost)', inr(costValue)],
+    ['Stock value (selling)', inr(sellValue)],
+    ['Sales, 30 days', inr(rev30)],
+    ['Low / out of stock', low.length, low.length ? 'warn' : ''],
+  ].map(([l, v, cls]) => `<div class="kpi ${cls || ''}"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('');
+
+  $('salesByChannel').innerHTML = Object.keys(byCh).length ? `<table>
+    <tr><th>Channel</th><th class="right">Units</th><th class="right">Revenue</th><th class="right">Gross profit</th></tr>
+    ${Object.entries(byCh).sort((a, b) => b[1].revenue - a[1].revenue).map(([ch, c]) => `<tr>
+      <td>${esc(ch)}</td><td class="right">${c.units}</td><td class="right">${ch === 'Damage' ? '—' : inr(c.revenue)}</td>
+      <td class="right ${ch === 'Damage' ? 'neg' : ''}">${ch === 'Damage' ? '−' + inr(c.cost) : inr(c.revenue - c.cost)}</td></tr>`).join('')}
+  </table>` : '<p class="muted">No sales recorded in the last 30 days.</p>';
+
+  $('lowStock').innerHTML = low.length ? `<table>
+    <tr><th>SKU</th><th>Name</th><th class="right">Stock</th><th class="right">Alert at</th></tr>
+    ${low.map(p => `<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}</td>
+      <td class="right"><span class="stock ${stockClass(p)}">${p.stock}</span></td><td class="right muted">${p.low_stock_at}</td></tr>`).join('')}
+  </table>` : '<p class="muted">All good — nothing is low.</p>';
+
+  const rows = active.filter(p => p.sell_price > 0).map(p => ({ ...p, margin: p.sell_price - p.cost_price, pct: p.sell_price ? (p.sell_price - p.cost_price) / p.sell_price * 100 : 0 }))
+    .sort((a, b) => b.pct - a.pct);
+  $('marginTable').innerHTML = rows.length ? `<table>
+    <tr><th>SKU</th><th>Name</th><th class="right">Cost</th><th class="right">Selling</th><th class="right">MRP</th><th class="right">Margin</th><th class="right">Margin %</th><th class="right">Stock</th></tr>
+    ${rows.map(p => `<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}</td><td class="right">${inr2(p.cost_price)}</td>
+      <td class="right">${inr2(p.sell_price)}</td><td class="right muted">${inr2(p.mrp)}</td>
+      <td class="right ${p.margin < 0 ? 'neg' : 'pos'}">${inr2(p.margin)}</td><td class="right">${p.pct.toFixed(0)}%</td><td class="right">${p.stock}</td></tr>`).join('')}
+  </table>` : '<p class="muted">Add selling prices to products to see margins.</p>';
+}
+
+// ===================== PRODUCTS =====================
+function filteredProducts() {
+  const q = $('pSearch').value.trim().toLowerCase();
+  const cat = $('pCategory').value;
+  const st = $('pStatus').value;
+  return products.filter(p => {
+    if (q && !(p.sku + ' ' + p.name).toLowerCase().includes(q)) return false;
+    if (cat && p.category !== cat) return false;
+    if (st === 'active' && !p.active) return false;
+    if (st === 'inactive' && p.active) return false;
+    if (st === 'low' && !(p.active && stockClass(p))) return false;
+    return true;
+  });
+}
+
+function renderProducts() {
+  const list = filteredProducts();
+  if (!products.length) {
+    $('productGrid').innerHTML = '<div class="empty" style="grid-column:1/-1">No products yet — click <b>+ Add product</b> to start.</div>';
+    return;
+  }
+  $('productGrid').innerHTML = list.length ? list.map(p => `
+    <div class="card ${p.active ? '' : 'inactive'}">
+      <div class="img">${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : 'No photo'}</div>
+      <div class="body">
+        <div class="top"><span class="sku">${esc(p.sku)}${p.category ? ' · ' + esc(p.category) : ''}</span>
+          <span class="stock ${stockClass(p)}">${p.stock} in stock</span></div>
+        <div class="name">${esc(p.name)}</div>
+        <div class="prices"><span>Cost <b>${inr2(p.cost_price)}</b></span><span>Sell <b>${inr2(p.sell_price)}</b></span><span>MRP <b>${inr2(p.mrp)}</b></span></div>
+      </div>
+      <div class="actions">
+        <button class="btn sm in" data-act="in" data-id="${p.id}">+ In</button>
+        <button class="btn sm out" data-act="out" data-id="${p.id}">− Out</button>
+        <button class="btn sm" data-act="adjust" data-id="${p.id}" title="Correct stock count">Adjust</button>
+        <button class="btn sm" data-act="edit" data-id="${p.id}">Edit</button>
+      </div>
+    </div>`).join('') : '<div class="empty" style="grid-column:1/-1">No products match the filters.</div>';
+}
+
+['pSearch', 'pCategory', 'pStatus'].forEach(id => $(id).addEventListener('input', renderProducts));
+
+$('productGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const p = products.find(x => x.id === Number(b.dataset.id));
+  if (b.dataset.act === 'edit') openProduct(p); else openMove(p, b.dataset.act);
+});
+
+$('pExport').addEventListener('click', () => {
+  downloadCsv('mns-products-' + todayStr() + '.csv', [
+    ['SKU', 'Name', 'Category', 'Stock', 'Purchase price', 'Selling price', 'MRP', 'Stock value (cost)', 'Low stock at', 'Amazon ASIN', 'Flipkart FSN', 'Active'],
+    ...filteredProducts().map(p => [p.sku, p.name, p.category, p.stock, p.cost_price, p.sell_price, p.mrp,
+      (Math.max(0, p.stock) * p.cost_price).toFixed(2), p.low_stock_at, p.amazon_asin, p.flipkart_fsn, p.active ? 'Yes' : 'No']),
+  ]);
+});
+
+// ---- product modal ----
+let pmImage = null;
+function setPmImage(src) {
+  pmImage = src;
+  $('pmPrev').innerHTML = src ? `<img src="${esc(src)}" alt="">` : 'No photo';
+}
+
+function openProduct(p) {
+  const isNew = !p;
+  p = p || { active: 1, low_stock_at: 3 };
+  $('pmTitle').textContent = isNew ? 'Add product' : 'Edit product';
+  $('pmId').value = p.id || '';
+  $('pmSku').value = p.sku || '';
+  $('pmCat').value = p.category || '';
+  $('pmName').value = p.name || '';
+  $('pmCost').value = p.cost_price ?? '';
+  $('pmSell').value = p.sell_price ?? '';
+  $('pmMrp').value = p.mrp ?? '';
+  $('pmLow').value = p.low_stock_at ?? 3;
+  $('pmAsin').value = p.amazon_asin || '';
+  $('pmFsn').value = p.flipkart_fsn || '';
+  $('pmActive').checked = !!p.active;
+  $('pmOpening').value = 0;
+  $('pmOpeningWrap').classList.toggle('hidden', !isNew);
+  $('pmDelete').classList.toggle('hidden', isNew);
+  $('pmFile').value = '';
+  setPmImage(p.image || null);
+  $('productModal').classList.remove('hidden');
+  $('pmSku').focus();
+}
+
+$('pAdd').addEventListener('click', () => openProduct(null));
+$('pmClearImg').addEventListener('click', () => setPmImage(null));
+
+// Shrink photos before upload so the database stays small
+$('pmFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    const max = 400, scale = Math.min(1, max / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    setPmImage(c.toDataURL('image/jpeg', 0.78));
+    URL.revokeObjectURL(img.src);
+  };
+  img.onerror = () => toast('Could not read that image', true);
+  img.src = URL.createObjectURL(file);
+});
+
+$('productForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = {
+    id: Number($('pmId').value) || undefined,
+    sku: $('pmSku').value, name: $('pmName').value, category: $('pmCat').value, image: pmImage,
+    cost_price: $('pmCost').value, sell_price: $('pmSell').value, mrp: $('pmMrp').value,
+    low_stock_at: $('pmLow').value, amazon_asin: $('pmAsin').value, flipkart_fsn: $('pmFsn').value,
+    active: $('pmActive').checked ? 1 : 0, opening_stock: $('pmOpening').value,
+  };
+  try {
+    await api('saveProduct', body);
+    closeModals(); toast('Product saved');
+    refreshAll();
+  } catch (err) { toast(err.message, true); }
+});
+
+$('pmDelete').addEventListener('click', async () => {
+  if (!confirm('Delete this product permanently?')) return;
+  try {
+    await api('deleteProduct', { id: Number($('pmId').value) });
+    closeModals(); toast('Product deleted'); refreshAll();
+  } catch (err) { toast(err.message, true); }
+});
+
+// ---- stock movement modal ----
+function openMove(p, type) {
+  const titles = { in: 'Stock in (purchase)', out: 'Stock out (sale)', adjust: 'Adjust stock' };
+  $('mmTitle').textContent = titles[type];
+  $('mmProduct').textContent = `${p.sku} — ${p.name} · currently ${p.stock} in stock`;
+  $('mmPid').value = p.id; $('mmType').value = type;
+  $('mmQty').value = ''; $('mmNote').value = '';
+  $('mmDate').value = todayStr();
+  $('mmQty').min = type === 'adjust' ? '' : '1';
+  $('mmQtyLabel').textContent = type === 'adjust' ? 'Change (+ or −)' : 'Quantity';
+  $('mmChannelWrap').classList.toggle('hidden', type !== 'out');
+  $('mmPriceLabel').textContent = type === 'in' ? 'Purchase price ₹ / unit' : 'Sold at ₹ / unit';
+  $('mmPrice').parentElement.classList.toggle('hidden', type === 'adjust');
+  $('mmPrice').value = type === 'in' ? p.cost_price : type === 'out' ? p.sell_price : '';
+  $('mmUpdateCostWrap').classList.toggle('hidden', type !== 'in');
+  $('mmUpdateCost').checked = false;
+  $('moveModal').classList.remove('hidden');
+  $('mmQty').focus();
+}
+
+$('moveForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    const r = await api('addMovement', {
+      product_id: Number($('mmPid').value), type: $('mmType').value, qty: $('mmQty').value,
+      channel: $('mmChannel').value, unit_price: $('mmPrice').value, note: $('mmNote').value,
+      move_date: $('mmDate').value, update_cost: $('mmUpdateCost').checked,
+    });
+    closeModals(); toast('Saved — stock now ' + r.stock);
+    refreshAll();
+  } catch (err) { toast(err.message, true); }
+});
+
+function closeModals() { document.querySelectorAll('.modal-bg').forEach(m => m.classList.add('hidden')); }
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeModals));
+document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target === bg) closeModals(); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModals(); });
+
+// ===================== STOCK LOG =====================
+function filteredMovements() {
+  const q = $('mSearch').value.trim().toLowerCase();
+  const type = $('mType').value, ch = $('mChannel').value, from = $('mFrom').value, to = $('mTo').value;
+  return movements.filter(m => {
+    if (q && !(m.sku + ' ' + m.name + ' ' + (m.note || '')).toLowerCase().includes(q)) return false;
+    if (type && m.type !== type) return false;
+    if (ch && m.channel !== ch) return false;
+    if (from && m.move_date < from) return false;
+    if (to && m.move_date > to) return false;
+    return true;
+  });
+}
+
+function renderMovements() {
+  const list = filteredMovements();
+  const label = { in: 'In', out: 'Out', adjust: 'Adjust' };
+  $('movementTable').innerHTML = list.length ? `<table>
+    <tr><th>Date</th><th>SKU</th><th>Name</th><th>Type</th><th>Channel</th><th class="right">Qty</th><th class="right">Unit ₹</th><th>Note</th><th>By</th><th></th></tr>
+    ${list.map(m => `<tr>
+      <td>${esc(m.move_date)}</td><td>${esc(m.sku)}</td><td>${esc(m.name)}</td>
+      <td><span class="tag ${m.type}">${label[m.type]}</span></td><td>${esc(m.channel || '')}</td>
+      <td class="right ${m.delta > 0 ? 'pos' : 'neg'}">${m.delta > 0 ? '+' : ''}${m.delta}</td>
+      <td class="right">${m.unit_price ? inr2(m.unit_price) : ''}</td>
+      <td class="muted">${esc(m.note || '')}</td><td class="muted">${esc(m.created_by || '')}</td>
+      <td><button class="btn sm danger" data-del="${m.id}" title="Delete entry">✕</button></td></tr>`).join('')}
+  </table>` : '<p class="muted">No stock entries yet.</p>';
+}
+
+['mSearch', 'mType', 'mChannel', 'mFrom', 'mTo'].forEach(id => $(id).addEventListener('input', renderMovements));
+
+$('movementTable').addEventListener('click', async e => {
+  const b = e.target.closest('[data-del]');
+  if (!b || !confirm('Delete this stock entry? Stock will be recalculated.')) return;
+  try { await api('deleteMovement', { id: Number(b.dataset.del) }); toast('Entry deleted'); refreshAll(); }
+  catch (err) { toast(err.message, true); }
+});
+
+$('mExport').addEventListener('click', () => {
+  downloadCsv('mns-stock-log-' + todayStr() + '.csv', [
+    ['Date', 'SKU', 'Name', 'Type', 'Channel', 'Qty', 'Unit price', 'Note', 'By'],
+    ...filteredMovements().map(m => [m.move_date, m.sku, m.name, m.type, m.channel, m.delta, m.unit_price, m.note, m.created_by]),
+  ]);
+});
+
+// ===================== SETTINGS =====================
+$('pwForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    await api('changePassword', { old_password: $('pwOld').value, new_password: $('pwNew').value });
+    $('pwOld').value = $('pwNew').value = '';
+    toast('Password updated');
+  } catch (err) { toast(err.message, true); }
+});
+
+async function loadUsers() {
+  try {
+    const { users } = await api('listUsers');
+    $('userList').innerHTML = `<table><tr><th>Username</th><th>Role</th><th></th></tr>
+      ${users.map(u => `<tr><td>${esc(u.username)}</td><td>${esc(u.role)}</td>
+        <td class="right">${u.id === me.id ? '<span class="muted">you</span>' : `<button class="btn sm danger" data-uid="${u.id}">Remove</button>`}</td></tr>`).join('')}</table>`;
+  } catch (err) { toast(err.message, true); }
+}
+
+$('userList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-uid]');
+  if (!b || !confirm('Remove this user?')) return;
+  try { await api('deleteUser', { id: Number(b.dataset.uid) }); loadUsers(); }
+  catch (err) { toast(err.message, true); }
+});
+
+$('userForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    await api('addUser', { username: $('uName').value, password: $('uPass').value, role: $('uRole').value });
+    $('uName').value = $('uPass').value = '';
+    toast('User added'); loadUsers();
+  } catch (err) { toast(err.message, true); }
+});
+
+boot();
+</script>
+</body>
+</html>
