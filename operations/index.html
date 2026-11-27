@@ -97,7 +97,7 @@ tr:last-child td{border-bottom:none}
 .card .name{font-weight:500;margin:2px 0 8px}
 .card .prices{display:flex;gap:12px;font-size:13px;color:var(--muted)}
 .card .prices b{color:var(--text);font-weight:500}
-.stock{font-size:13px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(123,198,160,.15);color:var(--ok)}
+.stock{white-space:nowrap;font-size:13px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(123,198,160,.15);color:var(--ok)}
 .stock.low{background:rgba(232,176,74,.15);color:var(--warn)}
 .stock.zero{background:rgba(229,112,122,.15);color:var(--bad)}
 .card .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -127,6 +127,16 @@ tr:last-child td{border-bottom:none}
   .toolbar input,.toolbar select{min-width:0;flex:1 1 140px}
   .card .img{aspect-ratio:16/9}
 }
+/* ---- colour variants ---- */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:3px 10px 3px 6px;font-size:13px;cursor:pointer;color:var(--muted)}
+.chip:hover{border-color:var(--accent)}
+.chip.on{border-color:var(--accent);color:var(--text);background:var(--surface2)}
+.chip i{width:12px;height:12px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.chip b{font-weight:600}
+.chip.zero b{color:var(--bad)}
+.var-note{font-size:12px;color:var(--accent);margin-top:4px;min-height:16px}
+
 /* ---- pricing calculator ---- */
 .pr-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
 .pr-f{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
@@ -208,6 +218,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
         <div class="panel"><h3>Sales — last 30 days by channel</h3><div id="salesByChannel"></div></div>
         <div class="panel"><h3>Low / out of stock</h3><div id="lowStock"></div></div>
       </div>
+      <div class="panel" style="margin-top:16px" id="familyPanel"><h3>Stock by product <span class="muted" style="font-weight:400">(colour variants grouped by SKU)</span></h3><div id="familyTable"></div></div>
       <div class="panel" style="margin-top:16px"><h3>Margin per SKU <span class="muted" style="font-weight:400">(before marketplace fees)</span></h3><div id="marginTable"></div></div>
     </div>
 
@@ -345,7 +356,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
       </div>
     </div>
     <div class="row">
-      <div><label>SKU *</label><input id="pmSku" required placeholder="e.g. MNS-ER-001"></div>
+      <div><label>SKU *</label><input id="pmSku" required placeholder="e.g. ER-001-GLD"><div class="var-note" id="pmVarNote"></div></div>
       <div><label>Category</label><input id="pmCat" list="catList" placeholder="Earrings"></div>
     </div>
     <label>Product name *</label><input id="pmName" required>
@@ -439,6 +450,35 @@ async function api(action, body, query = '') {
   if (!data.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
+
+// ---- colour variants from SKU: ER-001-GLD → parent ER-001, variant GLD ----
+const COLOURS = {
+  GLD: ['Gold', '#D4A63A'], SLV: ['Silver', '#C9CDD2'], RGD: ['Rose Gold', '#D99A8B'], RG: ['Rose Gold', '#D99A8B'],
+  BLK: ['Black', '#2B2B2B'], WHT: ['White', '#F2EEE8'], OXD: ['Oxidised', '#6E6A64'], GRN: ['Green', '#3F8F5B'],
+  RED: ['Red', '#B83A3A'], BLU: ['Blue', '#3A63B8'], PNK: ['Pink', '#E08AA8'], MRN: ['Maroon', '#7A1E2C'], MLT: ['Multi', 'conic-gradient(#D4A63A,#B83A3A,#3A63B8,#3F8F5B,#D4A63A)'],
+};
+function skuParts(sku) {
+  const parts = String(sku || '').toUpperCase().split('-');
+  const last = parts[parts.length - 1];
+  if (parts.length >= 3 && /^[A-Z]{2,4}$/.test(last)) {
+    const c = COLOURS[last];
+    return { parent: parts.slice(0, -1).join('-'), code: last, label: c ? c[0] : last, swatch: c ? c[1] : 'var(--muted)' };
+  }
+  return { parent: String(sku || '').toUpperCase(), code: '', label: '', swatch: '' };
+}
+// Name shared by all variants: "Gold Bow Stud Earrings" + "Silver Bow Stud Earrings" → "Bow Stud Earrings"
+function familyName(list) {
+  const strip = p => { const l = skuParts(p.sku).label; return l ? p.name.replace(new RegExp('\\b' + l.replace(/\s+/g, '\\s+') + '\\b', 'i'), '').replace(/\s{2,}/g, ' ').trim() : p.name; };
+  const names = [...new Set(list.map(strip))];
+  return names.length === 1 && names[0] ? names[0] : list[0].name;
+}
+// Group products by parent SKU, keeping the input order
+function groupFamilies(list) {
+  const map = new Map();
+  list.forEach(p => { const k = skuParts(p.sku).parent; if (!map.has(k)) map.set(k, []); map.get(k).push(p); });
+  return [...map.entries()].map(([parent, items]) => ({ parent, items, name: familyName(items) }));
+}
+const famSel = {}; // parent SKU → selected variant id on its card
 
 function stockClass(p) {
   if (p.stock <= 0) return 'zero';
@@ -598,6 +638,17 @@ function renderDashboard() {
       <td class="right"><span class="stock ${stockClass(p)}">${p.stock}</span></td><td class="right muted">${p.low_stock_at}</td></tr>`).join('')}
   </table>` : '<p class="muted">All good — nothing is low.</p>';
 
+  const fams = groupFamilies(active.slice().sort((a, b) => a.sku.localeCompare(b.sku)));
+  const sold = {};
+  movements.filter(m => m.type === 'out' && m.channel !== 'Damage' && m.move_date >= since).forEach(m => { sold[m.product_id] = (sold[m.product_id] || 0) - m.delta; });
+  $('familyTable').innerHTML = fams.length ? `<table>
+    <tr><th>Parent SKU</th><th>Product</th><th>Colours</th><th class="right">Total stock</th><th class="right">Sold, 30 days</th></tr>
+    ${fams.map(f => `<tr><td>${esc(f.parent)}</td><td>${esc(f.name)}</td>
+      <td>${f.items.map(v => { const s = skuParts(v.sku); return `<span class="chip" style="cursor:default;margin:2px 4px 2px 0"><i style="background:${esc(s.swatch || 'var(--muted)')}"></i>${esc(s.label || '—')} <b>${v.stock}</b></span>`; }).join('')}</td>
+      <td class="right">${f.items.reduce((s, v) => s + v.stock, 0)}</td>
+      <td class="right">${f.items.reduce((s, v) => s + (sold[v.id] || 0), 0)}</td></tr>`).join('')}
+  </table>` : '<p class="muted">No products yet.</p>';
+
   const rows = active.filter(p => p.sell_price > 0).map(p => ({ ...p, margin: p.sell_price - p.cost_price, pct: p.sell_price ? (p.sell_price - p.cost_price) / p.sell_price * 100 : 0 }))
     .sort((a, b) => b.pct - a.pct);
   $('marginTable').innerHTML = rows.length ? `<table>
@@ -629,13 +680,21 @@ function renderProducts() {
     $('productGrid').innerHTML = '<div class="empty" style="grid-column:1/-1">No products yet — click <b>+ Add product</b> to start.</div>';
     return;
   }
-  $('productGrid').innerHTML = list.length ? list.map(p => `
-    <div class="card ${p.active ? '' : 'inactive'}" data-card="${p.id}" style="cursor:pointer" title="Click to edit">
+  $('productGrid').innerHTML = list.length ? groupFamilies(list).map(f => {
+    const multi = f.items.length > 1;
+    const p = (multi && f.items.find(x => x.id === famSel[f.parent])) || f.items[0];
+    const total = f.items.reduce((s, x) => s + x.stock, 0);
+    const chips = multi ? `<div class="chips">${f.items.map(v => { const s = skuParts(v.sku);
+      return `<button type="button" class="chip ${v.id === p.id ? 'on' : ''} ${v.stock <= 0 ? 'zero' : ''}" data-chip="${v.id}" data-fam="${esc(f.parent)}" title="${esc(v.sku)}"><i style="background:${esc(s.swatch)}"></i>${esc(s.label || v.sku)} <b>${v.stock}</b></button>`; }).join('')}</div>` : '';
+    return `
+    <div class="card ${p.active ? '' : 'inactive'}" data-card="${p.id}" style="cursor:pointer" title="Click to edit ${esc(p.sku)}">
       <div class="img">${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : 'No photo'}</div>
       <div class="body">
-        <div class="top"><span class="sku">${esc(p.sku)}${p.category ? ' · ' + esc(p.category) : ''}</span>
-          <span class="stock ${stockClass(p)}">${p.stock} in stock</span></div>
-        <div class="name">${esc(p.name)}</div>
+        <div class="top"><span class="sku">${esc(multi ? f.parent : p.sku)}${p.category ? ' · ' + esc(p.category) : ''}</span>
+          ${multi ? `<span class="stock ${stockClass({ stock: total, low_stock_at: Math.max(...f.items.map(x => x.low_stock_at)) })}" title="All colours together">${total} total</span>`
+                  : `<span class="stock ${stockClass(p)}">${p.stock} in stock</span>`}</div>
+        <div class="name">${esc(multi ? f.name : p.name)}</div>
+        ${chips}
         <div class="prices"><span>Cost <b>${inr2(p.cost_price)}</b></span><span>Sell <b>${inr2(p.sell_price)}</b></span><span>MRP <b>${inr2(p.mrp)}</b></span></div>
       </div>
       <div class="actions">
@@ -644,12 +703,14 @@ function renderProducts() {
         <button class="btn sm" data-act="adjust" data-id="${p.id}" title="Correct stock count">Adjust</button>
         <button class="btn sm" data-act="edit" data-id="${p.id}">Edit</button>
       </div>
-    </div>`).join('') : '<div class="empty" style="grid-column:1/-1">No products match the filters.</div>';
+    </div>`; }).join('') : '<div class="empty" style="grid-column:1/-1">No products match the filters.</div>';
 }
 
 ['pSearch', 'pCategory', 'pStatus'].forEach(id => $(id).addEventListener('input', renderProducts));
 
 $('productGrid').addEventListener('click', e => {
+  const chip = e.target.closest('[data-chip]');
+  if (chip) { famSel[chip.dataset.fam] = Number(chip.dataset.chip); renderProducts(); return; }
   const b = e.target.closest('[data-act]');
   if (!b) {
     // Click anywhere else on a card (photo, name, prices) opens Edit
@@ -663,8 +724,8 @@ $('productGrid').addEventListener('click', e => {
 
 $('pExport').addEventListener('click', () => {
   downloadCsv('mns-products-' + todayStr() + '.csv', [
-    ['SKU', 'Name', 'Category', 'Stock', 'Purchase price', 'Selling price', 'MRP', 'Stock value (cost)', 'Low stock at', 'Amazon ASIN', 'Flipkart FSN', 'Active'],
-    ...filteredProducts().map(p => [p.sku, p.name, p.category, p.stock, p.cost_price, p.sell_price, p.mrp,
+    ['SKU', 'Parent SKU', 'Variant (colour)', 'Name', 'Category', 'Stock', 'Purchase price', 'Selling price', 'MRP', 'Stock value (cost)', 'Low stock at', 'Amazon ASIN', 'Flipkart FSN', 'Active'],
+    ...filteredProducts().map(p => [p.sku, skuParts(p.sku).parent, skuParts(p.sku).label, p.name, p.category, p.stock, p.cost_price, p.sell_price, p.mrp,
       (Math.max(0, p.stock) * p.cost_price).toFixed(2), p.low_stock_at, p.amazon_asin, p.flipkart_fsn, p.active ? 'Yes' : 'No']),
   ]);
 });
@@ -696,9 +757,20 @@ function openProduct(p) {
   $('pmDelete').classList.toggle('hidden', isNew);
   $('pmFile').value = '';
   setPmImage(p.image || null);
+  pmVarNote();
   $('productModal').classList.remove('hidden');
   $('pmSku').focus();
 }
+
+// Show which product family a SKU belongs to while typing
+function pmVarNote() {
+  const s = skuParts($('pmSku').value);
+  if (!s.code) { $('pmVarNote').textContent = ''; return; }
+  const id = Number($('pmId').value);
+  const sibs = products.filter(p => p.id !== id && skuParts(p.sku).parent === s.parent).map(p => skuParts(p.sku).label);
+  $('pmVarNote').textContent = `${s.label} variant of ${s.parent}` + (sibs.length ? ` · also: ${sibs.join(', ')}` : '');
+}
+$('pmSku').addEventListener('input', pmVarNote);
 
 $('pAdd').addEventListener('click', () => openProduct(null));
 $('pmClearImg').addEventListener('click', () => setPmImage(null));
@@ -880,14 +952,27 @@ function prNice(v, from, target) {
 }
 const prMrpOf = (price, disc) => Math.ceil((price / (1 - Math.min(Math.max(disc, 0), 90) / 100) + 1) / 50) * 50 - 1;
 
+// Options: one per product family (all colours together) plus each single SKU
 function fillPricingProducts() {
   const keep = $('prProduct').value;
-  $('prProduct').innerHTML = '<option value="">Custom</option>' + products.filter(p => p.active)
-    .map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join('');
-  $('prProduct').value = products.some(p => String(p.id) === keep) ? keep : '';
+  const fams = groupFamilies(products.filter(p => p.active).sort((a, b) => a.sku.localeCompare(b.sku)));
+  const famOpts = fams.filter(f => f.items.length > 1).map(f =>
+    `<option value="fam:${esc(f.parent)}">${esc(f.parent)} — ${esc(f.name)} (${f.items.map(v => esc(skuParts(v.sku).label)).join(' + ')})</option>`).join('');
+  const skuOpts = fams.flatMap(f => f.items).map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join('');
+  $('prProduct').innerHTML = '<option value="">Custom</option>' +
+    (famOpts ? `<optgroup label="All colours together">${famOpts}</optgroup>` : '') +
+    `<optgroup label="Single SKU">${skuOpts}</optgroup>`;
+  $('prProduct').value = [...$('prProduct').options].some(o => o.value === keep) ? keep : '';
 }
 
-function prSelected() { return products.find(p => String(p.id) === $('prProduct').value); }
+// Returns the products the calculator is pricing: a family's variants or one SKU
+function prSelectedList() {
+  const v = $('prProduct').value;
+  if (!v) return [];
+  if (v.startsWith('fam:')) return products.filter(p => p.active && skuParts(p.sku).parent === v.slice(4));
+  return products.filter(p => String(p.id) === v);
+}
+function prSelected() { return prSelectedList()[0]; }
 
 function renderPricing() {
   const v = prRead();
@@ -925,16 +1010,18 @@ function renderPricing() {
     return `<div class="pr-lr"><span>${prWhole(x)}</span><div class="pr-bar"><i style="${pos ? 'left' : 'right'}:50%;width:${w}%;background:${pos ? 'var(--ok)' : 'var(--bad)'}"></i></div><b style="color:${pos ? 'var(--ok)' : 'var(--bad)'}">${prWhole(pr[i])}</b></div>`;
   }).join('');
 
-  const sel = prSelected();
-  $('prApplyWrap').classList.toggle('hidden', !sel || !p);
-  if (sel && p) $('prApply').textContent = `Save ₹${p} / MRP ₹${prMrpOf(p, v.prDisc)} to ${sel.sku}`;
+  const sel = prSelectedList();
+  $('prApplyWrap').classList.toggle('hidden', !sel.length || !p);
+  if (sel.length && p) $('prApply').textContent = `Save ₹${p} / MRP ₹${prMrpOf(p, v.prDisc)} to ` +
+    (sel.length > 1 ? `${skuParts(sel[0].sku).parent} (${sel.map(x => skuParts(x.sku).label).join(' + ')})` : sel[0].sku);
 
   try { const s = {}; PR_FIELDS.forEach(id => { s[id] = $(id).type === 'checkbox' ? $(id).checked : $(id).value; }); localStorage.setItem(PR_KEY, JSON.stringify(s)); } catch (e) {}
 }
 
 function prLoadProduct() {
-  const sel = prSelected();
-  if (sel) $('prCost').value = +(sel.cost_price * (parseFloat($('prQty').value) || 1)).toFixed(2);
+  // For a family, use the highest variant cost so every colour stays profitable
+  const sel = prSelectedList();
+  if (sel.length) $('prCost').value = +(Math.max(...sel.map(x => x.cost_price || 0)) * (parseFloat($('prQty').value) || 1)).toFixed(2);
   prUserChk = false;
   renderPricing();
 }
@@ -946,18 +1033,18 @@ try {
 
 ['prCost', ...PR_FIELDS].forEach(id => $(id).addEventListener('input', renderPricing));
 $('prProduct').addEventListener('change', prLoadProduct);
-$('prQty').addEventListener('input', () => { if (prSelected()) prLoadProduct(); });
+$('prQty').addEventListener('input', () => { if (prSelectedList().length) prLoadProduct(); });
 $('prChk').addEventListener('input', () => { prUserChk = $('prChk').value !== ''; renderPricing(); });
 
 $('prApply').addEventListener('click', async () => {
-  const sel = prSelected();
+  const sel = prSelectedList();
   const price = parseFloat($('prChk').value) || 0;
-  if (!sel || !price) return;
+  if (!sel.length || !price) return;
   const mrp = prMrpOf(price, parseFloat($('prDisc').value) || 0);
   $('prApply').disabled = true;
   try {
-    await api('saveProduct', { ...sel, sell_price: price, mrp });
-    toast(`${sel.sku} saved — sell ₹${price}, MRP ₹${mrp}`);
+    for (const p of sel) await api('saveProduct', { ...p, sell_price: price, mrp });
+    toast(`${sel.map(x => x.sku).join(', ')} saved — sell ₹${price}, MRP ₹${mrp}`);
     await refreshAll();
   } catch (err) { toast(err.message, true); }
   finally { $('prApply').disabled = false; }
@@ -968,9 +1055,13 @@ $('pmCalc').addEventListener('click', () => {
   const id = $('pmId').value;
   const cost = parseFloat($('pmCost').value) || 0;
   closeModals();
-  $('prProduct').value = products.some(p => String(p.id) === id) ? id : '';
+  // A product with colour siblings opens as the whole family, so one price covers all colours
+  const fam = 'fam:' + skuParts($('pmSku').value).parent;
+  const hasFam = [...$('prProduct').options].some(o => o.value === fam);
+  $('prProduct').value = hasFam ? fam : products.some(p => String(p.id) === id) ? id : '';
   $('prQty').value = 1;
   $('prCost').value = cost;
+  if (hasFam) prLoadProduct();
   prUserChk = false;
   showTab('pricing');
 });
