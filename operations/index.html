@@ -127,6 +127,41 @@ tr:last-child td{border-bottom:none}
   .toolbar input,.toolbar select{min-width:0;flex:1 1 140px}
   .card .img{aspect-ratio:16/9}
 }
+/* ---- pricing calculator ---- */
+.pr-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
+.pr-f{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.pr-f:last-child{border-bottom:none}
+.pr-f.wide{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr)}
+.pr-f>label{margin:0;font-size:14px;color:var(--text)}
+.pr-f small{display:block;color:var(--muted);font-size:12px}
+.pr-f input{text-align:right}
+.pr-f .check{margin:0;color:var(--text)}
+.pr-sub{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:16px 0 4px}
+.pr-tag{position:relative;background:linear-gradient(160deg,var(--accent-strong),#7a2a36);border-radius:16px;padding:22px 22px 18px 52px;color:#fff}
+.pr-tag::before{content:"";position:absolute;left:18px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 3px var(--accent)}
+.pr-tag .k{font-size:13px;color:#f6d6d9}
+.pr-big{font-family:var(--serif);font-weight:700;font-size:clamp(52px,8vw,84px);line-height:1;white-space:nowrap}
+.pr-trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.25)}
+.pr-trio span{font-size:12px;color:#f6d6d9}
+.pr-trio b{display:block;font-family:var(--serif);font-size:24px;line-height:1.1;white-space:nowrap}
+.pr-apply{margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pr-apply .btn{background:var(--bg);border-color:var(--bg);color:var(--text)}
+.pr-apply .btn:hover{border-color:var(--accent)}
+.pr-check{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.pr-check input{width:130px;text-align:right}
+.pr-tbl td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pr-tbl tr.tot td{font-weight:600;font-size:16px}
+.pr-ladder{display:grid;gap:6px}
+.pr-lr{display:grid;grid-template-columns:56px minmax(0,1fr) 72px;gap:10px;align-items:center;font-size:14px}
+.pr-bar{height:12px;border-radius:6px;background:var(--surface2);position:relative;overflow:hidden}
+.pr-bar i{position:absolute;top:0;bottom:0;border-radius:6px}
+.pr-lr b{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:500}
+.pr-fees summary{cursor:pointer;color:var(--accent);font-weight:600}
+.pr-fees ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
+.lbl-link{float:right;font-size:12px;cursor:pointer;color:var(--accent);background:none;border:none;padding:0}
+@media (max-width:900px){.pr-grid{grid-template-columns:1fr}.pr-right{order:-1}}
+@media (max-width:420px){.pr-f{grid-template-columns:minmax(0,1fr) 108px}.pr-trio b{font-size:20px}}
+
 /* Number fields: typing only, no up/down spinner arrows */
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 input[type=number]::-webkit-inner-spin-button,
@@ -158,6 +193,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
         <button data-tab="dashboard" class="active">Dashboard</button>
         <button data-tab="products">Products</button>
         <button data-tab="stock">Stock log</button>
+        <button data-tab="pricing">Pricing</button>
         <button data-tab="settings">Settings</button>
       </nav>
       <span class="who" id="whoAmI"></span>
@@ -201,6 +237,71 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
         <button class="btn" id="mExport">Export CSV</button>
       </div>
       <div class="panel"><div id="movementTable"></div></div>
+    </div>
+
+    <!-- Pricing -->
+    <div data-view="pricing" class="hidden">
+      <div class="pr-grid">
+        <div class="panel">
+          <h3>Costs</h3>
+          <div class="pr-f wide"><label for="prProduct">Product<small>Fills cost from the product</small></label>
+            <select id="prProduct"><option value="">Custom</option></select></div>
+          <div class="pr-f"><label for="prQty">Pieces per order<small>2 for a 2-pair combo</small></label><input id="prQty" type="number" min="1" value="1"></div>
+          <div class="pr-f"><label for="prCost">Product cost per order ₹<small>All pieces in the box</small></label><input id="prCost" type="number" step="0.01" min="0" value="15"></div>
+          <div class="pr-f"><label for="prPack">Packaging ₹<small>Box, stamp, pouch, card</small></label><input id="prPack" type="number" step="0.01" min="0" value="15"></div>
+          <div class="pr-f wide"><label for="prCh">Shipping method</label><select id="prCh"><option value="es">Easy Ship</option><option value="ss">Self Ship</option></select></div>
+          <div class="pr-f" id="prStepRow"><label for="prStep">STEP level<small>New sellers start on Standard</small></label>
+            <select id="prStep"><option value="basic">Basic</option><option value="standard" selected>Standard</option><option value="premium">Premium / Advanced</option></select></div>
+          <div class="pr-f"><label for="prWt">Packed weight (g)</label><input id="prWt" type="number" min="1" value="100"></div>
+          <div class="pr-f hidden" id="prCourRow"><label for="prCour">Courier cost ₹</label><input id="prCour" type="number" step="0.01" min="0" value="60"></div>
+          <div class="pr-sub">Selling assumptions</div>
+          <div class="pr-f"><label for="prAds">Ads spend %<small>Of selling price</small></label><input id="prAds" type="number" step="0.1" min="0" value="12"></div>
+          <div class="pr-f"><label for="prRr">Return rate %<small>Of orders returned</small></label><input id="prRr" type="number" step="0.1" min="0" value="15"></div>
+          <div class="pr-f"><label for="prDmg">Returns you can't resell %</label><input id="prDmg" type="number" step="0.1" min="0" value="20"></div>
+          <div class="pr-f"><label for="prTgt">Target profit per order ₹<small>0 = just break even</small></label><input id="prTgt" type="number" step="1" value="50"></div>
+          <div class="pr-f"><label for="prGst">GST on product %</label><input id="prGst" type="number" step="0.1" min="0" value="3"></div>
+          <div class="pr-f"><label for="prDisc">Discount to show vs MRP %</label><input id="prDisc" type="number" step="1" min="0" max="90" value="50"></div>
+          <div class="pr-f"><label class="check"><input type="checkbox" id="prItc"> Claim 18% GST on Amazon fees as credit</label><span></span></div>
+        </div>
+
+        <div class="pr-right">
+          <div class="pr-tag" aria-live="polite">
+            <div class="k">Suggested selling price</div>
+            <div class="pr-big" id="prSug">₹—</div>
+            <div class="pr-trio">
+              <div><span>Break-even</span><b id="prBe">₹—</b></div>
+              <div><span>Min for target</span><b id="prMt">₹—</b></div>
+              <div><span>Suggested MRP</span><b id="prMrp">₹—</b></div>
+            </div>
+            <div class="pr-apply hidden" id="prApplyWrap"><button class="btn" id="prApply" type="button"></button></div>
+          </div>
+
+          <div class="panel" style="margin-top:16px">
+            <div class="pr-check"><label for="prChk" style="margin:0">Check a price ₹</label><input id="prChk" type="number" step="1" min="1"><span class="muted" style="font-size:13px">Starts at the suggested price — type your own to test</span></div>
+            <table class="pr-tbl"><tbody id="prBd"></tbody></table>
+            <p class="hint" id="prHold"></p>
+          </div>
+
+          <div class="panel" style="margin-top:16px">
+            <h3>Profit per order at common prices</h3>
+            <div class="pr-ladder" id="prLad"></div>
+          </div>
+
+          <details class="panel pr-fees" style="margin-top:16px">
+            <summary>Amazon fees used and how returns are counted</summary>
+            <ul>
+              <li>Referral fee, Fashion Jewellery: 0% up to ₹1,000; 22.5% above ₹1,000.</li>
+              <li>Easy Ship closing fee (from 7 Sep 2026): ₹2 up to ₹300 · ₹23 for ₹301–500 · ₹48 for ₹501–1,000 · ₹79 above.</li>
+              <li>Self Ship closing fee: ₹20 · ₹26 · ₹51 · ₹101 for the same bands.</li>
+              <li>Easy Ship shipping (flat, all India, from 16 Mar 2026), Standard: ₹55 first 500 g · ₹75 up to 1 kg · ₹112 up to 2 kg · +₹34/kg to 5 kg · +₹18/kg after. Basic ₹4 more, Premium ₹2 less.</li>
+              <li>Amazon adds 18% GST on all its fees. Unless you tick the credit box, it's counted as a cost.</li>
+              <li>Each return costs the forward fees again, a reverse shipment (assumed equal to forward shipping), a new box, and the product cost for pieces you can't resell.</li>
+              <li>TCS (0.5%) and TDS (0.1%) are held from payouts but can be claimed back, so they aren't counted as costs.</li>
+              <li>Rates read from sell.amazon.in on 27 Nov 2026. Confirm with Seller Central's fee preview once a listing is live.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
     </div>
 
     <!-- Settings -->
@@ -250,7 +351,7 @@ input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
     <label>Product name *</label><input id="pmName" required>
     <div class="row3">
       <div><label>Purchase price ₹</label><input id="pmCost" type="number" step="0.01" min="0"></div>
-      <div><label>Selling price ₹</label><input id="pmSell" type="number" step="0.01" min="0"></div>
+      <div><label>Selling price ₹ <button type="button" class="lbl-link" id="pmCalc" title="Open the price calculator for this product">Calculate</button></label><input id="pmSell" type="number" step="0.01" min="0"></div>
       <div><label>MRP ₹</label><input id="pmMrp" type="number" step="0.01" min="0"></div>
     </div>
     <div class="row3">
@@ -427,14 +528,18 @@ async function refreshAll() {
   } catch (e) { toast(e.message, true); }
 }
 
-function renderAll() { renderDashboard(); renderProducts(); renderMovements(); }
+function renderAll() { renderDashboard(); renderProducts(); renderMovements(); fillPricingProducts(); renderPricing(); }
 
-$('tabs').addEventListener('click', e => {
-  const tab = e.target.dataset.tab;
-  if (!tab) return;
+function showTab(tab) {
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('[data-view]').forEach(v => v.classList.toggle('hidden', v.dataset.view !== tab));
   if (tab === 'settings' && me.role === 'admin') loadUsers();
+  if (tab === 'pricing') renderPricing();
+}
+
+$('tabs').addEventListener('click', e => {
+  const tab = e.target.dataset.tab;
+  if (tab) showTab(tab);
 });
 
 function fillFilters() {
@@ -720,6 +825,154 @@ $('mExport').addEventListener('click', () => {
     ['Date', 'SKU', 'Name', 'Type', 'Channel', 'Qty', 'Unit price', 'Note', 'By'],
     ...filteredMovements().map(m => [m.move_date, m.sku, m.name, m.type, m.channel, m.delta, m.unit_price, m.note, m.created_by]),
   ]);
+});
+
+// ===================== PRICING CALCULATOR =====================
+// Amazon.in Fashion Jewellery fees, read from sell.amazon.in on 27 Nov 2026
+const PR_KEY = 'mns_pricing_v1';
+const PR_FIELDS = ['prQty', 'prPack', 'prCh', 'prStep', 'prWt', 'prCour', 'prAds', 'prRr', 'prDmg', 'prTgt', 'prGst', 'prDisc', 'prItc'];
+const PR_WHF = { basic: [59, 79, 116], standard: [55, 75, 112], premium: [53, 73, 110] };
+let prUserChk = false;
+
+const prClosing = (ch, p) => { const t = ch === 'es' ? [2, 23, 48, 79] : [20, 26, 51, 101]; return p <= 300 ? t[0] : p <= 500 ? t[1] : p <= 1000 ? t[2] : t[3]; };
+function prShip(step, g) {
+  const t = PR_WHF[step] || PR_WHF.standard;
+  if (g <= 500) return t[0];
+  if (g <= 1000) return t[1];
+  if (g <= 2000) return t[2];
+  const kg = Math.ceil((g - 2000) / 1000);
+  return t[2] + Math.min(kg, 3) * 34 + Math.max(kg - 3, 0) * 18;
+}
+const prMoney = v => (v < 0 ? '−₹' : '₹') + Math.abs(v).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const prWhole = v => (v < 0 ? '−₹' : '₹') + Math.abs(Math.round(v)).toLocaleString('en-IN');
+
+function prRead() {
+  const v = {};
+  ['prCost', ...PR_FIELDS].forEach(id => {
+    const e = $(id);
+    v[id] = e.type === 'checkbox' ? e.checked : e.tagName === 'SELECT' ? e.value : (parseFloat(e.value) || 0);
+  });
+  return v;
+}
+
+function prCalc(p, v) {
+  const gstOut = p * v.prGst / (100 + v.prGst);
+  const ref = p > 1000 ? p * 0.225 : 0;
+  const clo = prClosing(v.prCh, p);
+  const whf = v.prCh === 'es' ? prShip(v.prStep, v.prWt) : 0;
+  const cour = v.prCh === 'ss' ? v.prCour : 0;
+  const g = v.prItc ? 1 : 1.18;
+  const feeGst = v.prItc ? 0 : (ref + clo + whf) * 0.18;
+  const ads = p * v.prAds / 100;
+  // A return costs the forward fees again, a reverse trip, a new box and any piece that can't be resold
+  const perReturn = (clo + whf) * g + (v.prCh === 'es' ? whf * g : cour * 2) + v.prPack + v.prCost * v.prDmg / 100;
+  const ret = perReturn * v.prRr / 100;
+  const profit = p - gstOut - ref - clo - whf - feeGst - cour - v.prCost - v.prPack - ads - ret;
+  return { gstOut, ref, clo, whf, feeGst, cour, ads, ret, perReturn, profit };
+}
+function prMin(v, target) { for (let p = 1; p <= 20000; p++) if (prCalc(p, v).profit >= target) return p; return null; }
+// Round up to a price ending in 49 or 99 that still meets the target
+function prNice(v, from, target) {
+  if (from == null) return null;
+  let c = Math.ceil((from + 1) / 50) * 50 - 1;
+  for (let i = 0; i < 400; i++, c += 50) if (prCalc(c, v).profit >= target) return c;
+  return null;
+}
+const prMrpOf = (price, disc) => Math.ceil((price / (1 - Math.min(Math.max(disc, 0), 90) / 100) + 1) / 50) * 50 - 1;
+
+function fillPricingProducts() {
+  const keep = $('prProduct').value;
+  $('prProduct').innerHTML = '<option value="">Custom</option>' + products.filter(p => p.active)
+    .map(p => `<option value="${p.id}">${esc(p.sku)} — ${esc(p.name)}</option>`).join('');
+  $('prProduct').value = products.some(p => String(p.id) === keep) ? keep : '';
+}
+
+function prSelected() { return products.find(p => String(p.id) === $('prProduct').value); }
+
+function renderPricing() {
+  const v = prRead();
+  $('prStepRow').classList.toggle('hidden', v.prCh !== 'es');
+  $('prCourRow').classList.toggle('hidden', v.prCh !== 'ss');
+  const be = prMin(v, 0), mt = prMin(v, v.prTgt), sg = prNice(v, mt, v.prTgt);
+  $('prBe').textContent = be ? prWhole(be) : '—';
+  $('prMt').textContent = mt ? prWhole(mt) : '—';
+  $('prSug').textContent = sg ? prWhole(sg) : '—';
+  $('prMrp').textContent = sg ? prWhole(prMrpOf(sg, v.prDisc)) : '—';
+  if (!prUserChk) $('prChk').value = sg || '';
+
+  const p = parseFloat($('prChk').value) || 0;
+  const c = prCalc(p, v);
+  const rows = [
+    ['Selling price', p],
+    [`GST on product (${v.prGst}%, inside the price)`, -c.gstOut],
+    ['Referral fee', -c.ref],
+    ['Closing fee', -c.clo],
+    v.prCh === 'es' ? ['Easy Ship shipping fee', -c.whf] : ['Courier', -c.cour],
+    ['18% GST on Amazon fees' + (v.prItc ? ' (claimed as credit)' : ''), -c.feeGst],
+    ['Product cost', -v.prCost],
+    ['Packaging', -v.prPack],
+    [`Ads (${v.prAds}%)`, -c.ads],
+    [`Returns allowance (${v.prRr}% × ${prWhole(c.perReturn)} per return)`, -c.ret],
+  ];
+  $('prBd').innerHTML = rows.map(r => `<tr><td>${esc(r[0])}</td><td class="n">${prMoney(r[1])}</td></tr>`).join('') +
+    `<tr class="tot"><td>Profit per order</td><td class="n ${c.profit >= 0 ? 'pos' : 'neg'}" style="${c.profit < 0 ? 'color:var(--bad)' : ''}">${prMoney(c.profit)}</td></tr>`;
+  $('prHold').textContent = p ? `Amazon also holds about ${prMoney((p - c.gstOut) * 0.005 + p * 0.001)} per order as TCS + TDS — claim it back in your GST and income tax returns.` : '';
+
+  const ps = [99, 149, 199, 249, 299, 349, 399, 499, 599];
+  const pr = ps.map(x => prCalc(x, v).profit), mx = Math.max(...pr.map(Math.abs), 1);
+  $('prLad').innerHTML = ps.map((x, i) => {
+    const w = Math.abs(pr[i]) / mx * 50, pos = pr[i] >= 0;
+    return `<div class="pr-lr"><span>${prWhole(x)}</span><div class="pr-bar"><i style="${pos ? 'left' : 'right'}:50%;width:${w}%;background:${pos ? 'var(--ok)' : 'var(--bad)'}"></i></div><b style="color:${pos ? 'var(--ok)' : 'var(--bad)'}">${prWhole(pr[i])}</b></div>`;
+  }).join('');
+
+  const sel = prSelected();
+  $('prApplyWrap').classList.toggle('hidden', !sel || !p);
+  if (sel && p) $('prApply').textContent = `Save ₹${p} / MRP ₹${prMrpOf(p, v.prDisc)} to ${sel.sku}`;
+
+  try { const s = {}; PR_FIELDS.forEach(id => { s[id] = $(id).type === 'checkbox' ? $(id).checked : $(id).value; }); localStorage.setItem(PR_KEY, JSON.stringify(s)); } catch (e) {}
+}
+
+function prLoadProduct() {
+  const sel = prSelected();
+  if (sel) $('prCost').value = +(sel.cost_price * (parseFloat($('prQty').value) || 1)).toFixed(2);
+  prUserChk = false;
+  renderPricing();
+}
+
+try {
+  const s = JSON.parse(localStorage.getItem(PR_KEY) || 'null');
+  if (s) PR_FIELDS.forEach(id => { if (id in s) { if ($(id).type === 'checkbox') $(id).checked = s[id]; else $(id).value = s[id]; } });
+} catch (e) {}
+
+['prCost', ...PR_FIELDS].forEach(id => $(id).addEventListener('input', renderPricing));
+$('prProduct').addEventListener('change', prLoadProduct);
+$('prQty').addEventListener('input', () => { if (prSelected()) prLoadProduct(); });
+$('prChk').addEventListener('input', () => { prUserChk = $('prChk').value !== ''; renderPricing(); });
+
+$('prApply').addEventListener('click', async () => {
+  const sel = prSelected();
+  const price = parseFloat($('prChk').value) || 0;
+  if (!sel || !price) return;
+  const mrp = prMrpOf(price, parseFloat($('prDisc').value) || 0);
+  $('prApply').disabled = true;
+  try {
+    await api('saveProduct', { ...sel, sell_price: price, mrp });
+    toast(`${sel.sku} saved — sell ₹${price}, MRP ₹${mrp}`);
+    await refreshAll();
+  } catch (err) { toast(err.message, true); }
+  finally { $('prApply').disabled = false; }
+});
+
+// "Calculate" link in the product form opens Pricing for that product
+$('pmCalc').addEventListener('click', () => {
+  const id = $('pmId').value;
+  const cost = parseFloat($('pmCost').value) || 0;
+  closeModals();
+  $('prProduct').value = products.some(p => String(p.id) === id) ? id : '';
+  $('prQty').value = 1;
+  $('prCost').value = cost;
+  prUserChk = false;
+  showTab('pricing');
 });
 
 // ===================== SETTINGS =====================
