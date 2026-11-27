@@ -127,6 +127,10 @@ tr:last-child td{border-bottom:none}
   .toolbar input,.toolbar select{min-width:0;flex:1 1 140px}
   .card .img{aspect-ratio:16/9}
 }
+/* Number fields: typing only, no up/down spinner arrows */
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 </style>
 </head>
 <body>
@@ -749,6 +753,10 @@ $('userForm').addEventListener('submit', async e => {
 });
 
 boot();
+</script>
+<script>
+// Stop mouse-wheel from changing a focused number field (typing only)
+document.addEventListener('wheel',e=>{const a=document.activeElement;if(a&&a.type==='number'&&e.target===a)a.blur();},{passive:true});
 </script>
 </body>
 </html>
