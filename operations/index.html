@@ -525,7 +525,7 @@ function renderProducts() {
     return;
   }
   $('productGrid').innerHTML = list.length ? list.map(p => `
-    <div class="card ${p.active ? '' : 'inactive'}">
+    <div class="card ${p.active ? '' : 'inactive'}" data-card="${p.id}" style="cursor:pointer" title="Click to edit">
       <div class="img">${p.image ? `<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : 'No photo'}</div>
       <div class="body">
         <div class="top"><span class="sku">${esc(p.sku)}${p.category ? ' · ' + esc(p.category) : ''}</span>
@@ -546,7 +546,12 @@ function renderProducts() {
 
 $('productGrid').addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
-  if (!b) return;
+  if (!b) {
+    // Click anywhere else on a card (photo, name, prices) opens Edit
+    const c = e.target.closest('[data-card]');
+    if (c) openProduct(products.find(x => x.id === Number(c.dataset.card)));
+    return;
+  }
   const p = products.find(x => x.id === Number(b.dataset.id));
   if (b.dataset.act === 'edit') openProduct(p); else openMove(p, b.dataset.act);
 });
