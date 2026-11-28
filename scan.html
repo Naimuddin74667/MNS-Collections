@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coming soon – MNS Collections</title>
+<meta name="description" content="MNS Collections – Style that makes you smile. Our jewellery collection is coming soon.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#590D20">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-burgundy:#590D20;
+  --brand-blush:#F5B8C5;
+  --brand-ivory:#FFF2E8;
+  --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Jost',Futura,'Century Gothic','Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--brand-burgundy);color:var(--brand-ivory);font-family:var(--sans);font-size:17px;line-height:1.65;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;min-height:100svh;
+  padding:max(40px,env(safe-area-inset-top)) 24px max(40px,env(safe-area-inset-bottom))}
+main{width:100%;max-width:520px;text-align:center;display:flex;flex-direction:column;align-items:center}
+
+/* Fine double frame, echoing the packaging border */
+.frame{position:fixed;inset:14px;border:1px solid rgba(245,184,197,.35);pointer-events:none}
+.frame::after{content:"";position:absolute;inset:5px;border:1px solid rgba(245,184,197,.18)}
+
+.logo{width:min(250px,68vw);height:auto;display:block}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,8vw,2.7rem);line-height:1.15;margin:34px 0 14px;letter-spacing:.01em;text-wrap:balance}
+.lead{margin:0 auto;max-width:34ch;color:var(--brand-ivory);opacity:.92}
+
+.divider{display:flex;align-items:center;gap:14px;margin:34px 0 12px;width:100%;max-width:320px}
+.divider span{flex:1;height:1px;background:var(--brand-blush);opacity:.6}
+.divider svg{width:22px;height:18px;flex:none}
+
+.soon{font-family:var(--sans);font-weight:500;font-size:15px;letter-spacing:.42em;margin:0 0 30px;padding-left:.42em;color:var(--brand-blush)}
+.thanks{margin:0 auto;max-width:36ch;opacity:.92}
+.sign{margin:28px 0 0;font-family:var(--serif);font-style:italic;font-size:1.3rem;line-height:1.4}
+.sign b{display:block;font-style:normal;font-weight:600;letter-spacing:.04em;font-size:1.15rem;margin-top:2px}
+
+/* Subtle entrance */
+.rise{opacity:0;transform:translateY(10px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+.d1{animation-delay:.05s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}.d5{animation-delay:.7s}.d6{animation-delay:.85s}
+@keyframes rise{to{opacity:1;transform:none}}
+.twinkle{animation:twinkle 3.2s ease-in-out infinite}
+.twinkle.b{animation-delay:1.6s}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.rise{opacity:1;transform:none;animation:none}.twinkle{animation:none}}
+@media (min-width:700px){body{font-size:18px}.logo{width:280px}}
+</style>
+</head>
+<body>
+<div class="frame" aria-hidden="true"></div>
+<main>
+  <!-- Same logo artwork as the main website -->
+  <svg class="logo rise d1" viewBox="0 0 280 232" role="img" aria-label="MNS Collections – Style that makes you smile">
+    <text x="12" y="92" textLength="256" lengthAdjust="spacing" font-family="Cormorant Garamond, Georgia, serif" font-weight="700" font-size="112" fill="#FFF2E8">MNS</text>
+    <g transform="translate(12 100)">
+      <path d="M2 4Q128 44 254 4" fill="none" stroke="#F5B8C5" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M116 26H140L147 34L128 56L109 34Z" fill="#F5B8C5" stroke="#F5B8C5" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M109 34H147M121 26L118 34L128 56L138 34L135 26" fill="none" stroke="#FFF2E8" stroke-width="1.1" stroke-linejoin="round"/>
+      <path class="twinkle" d="M160 18L161.9 24.1L168 26L161.9 27.9L160 34L158.1 27.9L152 26L158.1 24.1Z" fill="#FFF2E8"/>
+      <path class="twinkle b" d="M98 40L99 43L102 44L99 45L98 48L97 45L94 44L97 43Z" fill="#FFF2E8"/>
+    </g>
+    <text x="12" y="184" textLength="256" lengthAdjust="spacing" font-family="Jost, Futura, sans-serif" font-weight="500" font-size="16" fill="#FFF2E8">COLLECTIONS</text>
+    <text x="140" y="216" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-weight="500" font-size="23" fill="#FFF2E8">Style that makes you smile</text>
+  </svg>
+
+  <h1 class="rise d2">Something Beautiful Is Coming</h1>
+  <p class="lead rise d3">We're preparing a beautiful collection of jewellery to add a little sparkle to your everyday style.</p>
+
+  <div class="divider rise d4" aria-hidden="true">
+    <span></span>
+    <svg viewBox="0 0 54 44"><path d="M13 3H41L51 15L27 41L3 15Z" fill="#F5B8C5"/><path d="M3 15H51M19 3L15 15L27 41L39 15L35 3" fill="none" stroke="#590D20" stroke-opacity=".45" stroke-width="2" stroke-linejoin="round"/></svg>
+    <span></span>
+  </div>
+  <p class="soon rise d4">COMING SOON</p>
+
+  <p class="thanks rise d5">Thank you for being part of our journey. We can't wait to share our collection with you.</p>
+  <p class="sign rise d6">With love,<b>MNS Collections</b></p>
+</main>
+</body>
+</html>
